@@ -10,12 +10,17 @@ namespace ShakespeareanPokemonDescriptor.Services
     public class PokemonDescriptorService : IDiscriptorService
     {
         private readonly IPokemonApiClient _pokemonApiClient;
+        private readonly ITranslatorApiClient _translatorApiClient;
         private readonly ILogger<PokemonDescriptorService> _logger;
         private readonly ICacheService _cacheService;
 
-        public PokemonDescriptorService(IPokemonApiClient pokemonApiClient, ILogger<PokemonDescriptorService> logger, ICacheService cacheService)
+        private readonly Random _random = new Random();
+
+        public PokemonDescriptorService(IPokemonApiClient pokemonApiClient, ITranslatorApiClient translatorApiClient,
+                                        ILogger<PokemonDescriptorService> logger, ICacheService cacheService)
         {
             _pokemonApiClient = pokemonApiClient;
+            _translatorApiClient = translatorApiClient;
             _logger = logger;
             _cacheService = cacheService;
         }
@@ -41,8 +46,18 @@ namespace ShakespeareanPokemonDescriptor.Services
             }
 
             var searchLang = LanguageHelper.TwoCharacterLanguageCode(language);
-            var allDescriptions = speciesText.Results.Where(x => x.Language.Name.Equals(searchLang, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Text);
+            var allDescriptions = speciesText.Results.Where(x => x.Language.Name.Equals(searchLang, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Text).ToArray();
 
+            var itemToTake = _random.Next(allDescriptions.Length - 1);
+            var descriptionToTranslate = allDescriptions[itemToTake];
+
+            var translationResult = await _translatorApiClient.Translate(descriptionToTranslate, cancellationToken);
+            if (translationResult == null)
+            {
+                return string.Empty;
+            }
+
+            return translationResult.Content?.Text ?? string.Empty;
         }
     }
 }

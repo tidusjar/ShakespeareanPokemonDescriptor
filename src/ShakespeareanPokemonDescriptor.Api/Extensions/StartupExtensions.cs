@@ -8,11 +8,20 @@ namespace ShakespeareanPokemonDescriptor.Api.Extensions
 {
     public static class StartupExtensions
     {
-        public static IServiceCollection ConfigureApplicationDependancies(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpClient<IPokemonApiClient, PokeApiClient>(x =>
             {
                 x.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Pokemon"));
+            });
+
+            services.AddHttpClient<IPokemonApiClient, PokeApiClient>(x =>
+            {
+                x.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Pokemon"));
+            });
+            services.AddHttpClient<ITranslatorApiClient, ShakespeareTranslatorApiClient>(x =>
+            {
+                x.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Translator"));
             });
             services.AddTransient<IDiscriptorService, PokemonDescriptorService>();
 

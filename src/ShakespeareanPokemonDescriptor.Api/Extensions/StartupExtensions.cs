@@ -16,6 +16,9 @@ namespace ShakespeareanPokemonDescriptor.Api.Extensions
             });
             services.AddTransient<IDiscriptorService, PokemonDescriptorService>();
 
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, CacheService>();
+
             return services;
         }
     }

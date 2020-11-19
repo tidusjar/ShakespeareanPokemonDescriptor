@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using ShakespeareanPokemonDescriptor.PokeApi;
 using ShakespeareanPokemonDescriptor.PokeApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +14,22 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
     {
         private PokemonDescriptorService Service { get; set; }
         private Mock<IPokemonApiClient> PokemonApiClientMock { get; set; }
+        private Mock<ICacheService> CacheServiceMock { get; set; }
 
         [SetUp]
         public void Setup()
         {
             PokemonApiClientMock = new Mock<IPokemonApiClient>();
-            Service = new PokemonDescriptorService(PokemonApiClientMock.Object);
+            CacheServiceMock = new Mock<ICacheService>();
+            Service = new PokemonDescriptorService(PokemonApiClientMock.Object, new NullLogger<PokemonDescriptorService>(), CacheServiceMock.Object);
+        }
+
+        [Test]
+        public async Task Valid_Test()
+        {
+            SetupBasicDataMocks("Charmander");
+            var result = await Service.Describe("Charmander", "en-GB", CancellationToken.None);
+            Assert.That(result, Is.EqualTo("Shakespearing Charmander Description"));
         }
 
         [Test]
@@ -43,21 +55,23 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
         [TestCase("", TestName = "EmptyRequestLanguage_Should_DefaultTo_En")]
         public async Task EmptyRequestLanguage_Should_DefaultTo_En(string input)
         {
-            SetupBasicDataMocks();
+            SetupBasicDataMocks("Mewto");
 
-            var result = await Service.Describe("some silly name", input, CancellationToken.None);
+            var result = await Service.Describe("Mewto", input, CancellationToken.None);
             Assert.That(result, Is.EqualTo("English"));
         }
 
 
-        private void SetupBasicDataMocks()
+        private void SetupBasicDataMocks(string pokemonName)
         {
-            PokemonApiClientMock.Setup(x => x.SearchPokemon(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new PokemonSearchResult
+            CacheServiceMock.Setup(x => x.GetOrAddAsync(CacheKeys.PokemonSearchKey + pokemonName, It.IsAny<Func<Task<PokemonSearchResult>>>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PokemonSearchResult
             {
                 Id = 1
             });
 
-            PokemonApiClientMock.Setup(x => x.GetSpecies(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new PokemonSpeciesSearchResult
+            CacheServiceMock.Setup(x => x.GetOrAddAsync(CacheKeys.PokemonSpeciesKey + 1, It.IsAny<Func<Task<PokemonSpeciesSearchResult>>>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PokemonSpeciesSearchResult
             {
                 Results = new List<PokemonSpeciesFlavourResult>
                 {
@@ -79,6 +93,5 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
                     },
                 }
             });
-        }
     }
 }

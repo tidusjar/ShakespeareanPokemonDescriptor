@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShakespeareanPokemonDescriptor.Api", "ShakespeareanPokemonDescriptor.Api\ShakespeareanPokemonDescriptor.Api.csproj", "{C9147D1A-FD46-4567-8FFD-B75C787E6706}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShakespeareanPokemonDescriptor.Api", "ShakespeareanPokemonDescriptor.Api\ShakespeareanPokemonDescriptor.Api.csproj", "{C9147D1A-FD46-4567-8FFD-B75C787E6706}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShakespeareanPokemonDescriptor.Services", "ShakespeareanPokemonDescriptor.Services\ShakespeareanPokemonDescriptor.Services.csproj", "{11D033B4-0993-4F94-A591-B2B67A6AD5E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShakespeareanPokemonDescriptor.PokeApi", "ShakespeareanPokemonDescriptor.PokeApi\ShakespeareanPokemonDescriptor.PokeApi.csproj", "{7E834FDC-79EA-4498-A80C-FA1B89AF70B4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShakespeareanPokemonDescriptor.FunTranslationsApi", "ShakespeareanPokemonDescriptor.FunTranslationsApi\ShakespeareanPokemonDescriptor.FunTranslationsApi.csproj", "{B55D360A-C78E-4F25-B73C-2D8D3378E71A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apis", "Apis", "{F40E9BE1-FE79-4367-B3C5-6E677051A10D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShakespeareanPokemonDescriptor.Services.Tests", "ShakespeareanPokemonDescriptor.Services.Tests\ShakespeareanPokemonDescriptor.Services.Tests.csproj", "{F506016D-906A-4BBB-93B4-4D709BFF4A7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +25,29 @@ Global
 		{C9147D1A-FD46-4567-8FFD-B75C787E6706}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9147D1A-FD46-4567-8FFD-B75C787E6706}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9147D1A-FD46-4567-8FFD-B75C787E6706}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11D033B4-0993-4F94-A591-B2B67A6AD5E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11D033B4-0993-4F94-A591-B2B67A6AD5E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11D033B4-0993-4F94-A591-B2B67A6AD5E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11D033B4-0993-4F94-A591-B2B67A6AD5E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E834FDC-79EA-4498-A80C-FA1B89AF70B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E834FDC-79EA-4498-A80C-FA1B89AF70B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E834FDC-79EA-4498-A80C-FA1B89AF70B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E834FDC-79EA-4498-A80C-FA1B89AF70B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B55D360A-C78E-4F25-B73C-2D8D3378E71A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B55D360A-C78E-4F25-B73C-2D8D3378E71A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B55D360A-C78E-4F25-B73C-2D8D3378E71A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B55D360A-C78E-4F25-B73C-2D8D3378E71A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F506016D-906A-4BBB-93B4-4D709BFF4A7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F506016D-906A-4BBB-93B4-4D709BFF4A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F506016D-906A-4BBB-93B4-4D709BFF4A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F506016D-906A-4BBB-93B4-4D709BFF4A7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7E834FDC-79EA-4498-A80C-FA1B89AF70B4} = {F40E9BE1-FE79-4367-B3C5-6E677051A10D}
+		{B55D360A-C78E-4F25-B73C-2D8D3378E71A} = {F40E9BE1-FE79-4367-B3C5-6E677051A10D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2F3C7C3A-DBAF-4101-9FE1-E0D5262A3AC8}

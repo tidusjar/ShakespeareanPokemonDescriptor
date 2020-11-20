@@ -4,6 +4,7 @@ using System.Threading;
 using ShakespeareanPokemonDescriptor.PokeApi;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using ShakespeareanPokemonDescriptor.Services.Models;
 
 namespace ShakespeareanPokemonDescriptor.Services
 {
@@ -25,28 +26,33 @@ namespace ShakespeareanPokemonDescriptor.Services
             _cacheService = cacheService;
         }
 
-        public async Task<string> Describe(string name, string language, CancellationToken cancellationToken)
+        public async Task<DescriptorResult> Describe(string name, string language, CancellationToken cancellationToken)
         {
-
-            var speciesResult = await _cacheService.GetOrAddAsync(CacheKeys.PokemonSearchKey + name, async () => await _pokemonApiClient.SearchPokemon(name, cancellationToken),
+            var searchResult = await _cacheService.GetOrAddAsync(CacheKeys.PokemonSearchKey + name, async () => await _pokemonApiClient.SearchPokemon(name, cancellationToken),
                 cancellationToken: cancellationToken);
 
-            if (speciesResult == null)
+            if (searchResult == null)
             {
                 _logger.LogInformation($"Search for Pokemon {name} returned a 404");
-                return string.Empty;
+                return null;
             }
-            var speciesText = await _cacheService.GetOrAddAsync(CacheKeys.PokemonSpeciesKey + speciesResult.Id, async () => await _pokemonApiClient.GetSpecies(speciesResult.Id, cancellationToken),
+            var species = await _cacheService.GetOrAddAsync(CacheKeys.PokemonSpeciesKey + searchResult.Id, async () => await _pokemonApiClient.GetSpecies(searchResult.Id, cancellationToken),
                 cancellationToken: cancellationToken);
 
-            if (speciesText == null)
+            if (species == null)
             {
-                _logger.LogInformation($"Species search Id {speciesResult.Id} returned a 404");
-                return string.Empty;
+                _logger.LogInformation($"Species search Id {searchResult.Id} returned a 404");
+                return null;
             }
 
             var searchLang = LanguageHelper.TwoCharacterLanguageCode(language);
-            var allDescriptions = speciesText.Results.Where(x => x.Language.Name.Equals(searchLang, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Text).ToArray();
+            var descriptionByLang = species.Results.Where(x => x.Language.Name.Equals(searchLang, StringComparison.InvariantCultureIgnoreCase));
+            if (!descriptionByLang.Any() && !searchLang.Equals(LanguageHelper.DefaultLanguage, StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Possible we do not have the specified language, fall back to the default
+                descriptionByLang = species.Results.Where(x => x.Language.Name.Equals(LanguageHelper.DefaultLanguage, StringComparison.InvariantCultureIgnoreCase));
+            }
+            var allDescriptions = descriptionByLang.Select(x => x.Text).ToArray();
 
             var itemToTake = _random.Next(allDescriptions.Length - 1);
             var descriptionToTranslate = allDescriptions[itemToTake];
@@ -54,10 +60,14 @@ namespace ShakespeareanPokemonDescriptor.Services
             var translationResult = await _translatorApiClient.Translate(descriptionToTranslate, cancellationToken);
             if (translationResult == null)
             {
-                return string.Empty;
+                return null;
             }
 
-            return translationResult.Content?.Text ?? string.Empty;
+            return new DescriptorResult
+            {
+                Description = translationResult.Content?.Translated ?? string.Empty,
+                Name = searchResult.Name
+            };
         }
     }
 }

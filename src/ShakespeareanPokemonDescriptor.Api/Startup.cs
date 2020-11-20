@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
+using ShakespeareanPokemonDescriptor.Api.Auth;
 using ShakespeareanPokemonDescriptor.Api.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ShakespeareanPokemonDescriptor.Api
 {
@@ -29,10 +23,11 @@ namespace ShakespeareanPokemonDescriptor.Api
         {
             services.ConfigureApplicationDependencies(Configuration);
             services.AddControllers();
-            services.AddSwaggerGen(c =>
+            services.AddAuthentication(opts =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShakespeareanPokemonDescriptor.Api", Version = "v1" });
-            });
+                opts.DefaultAuthenticateScheme = ApiKeyAuthOptions.DefaultScheme;
+                opts.DefaultChallengeScheme = ApiKeyAuthOptions.DefaultScheme;
+            }).AddApiKeySupport();
 
             services.AddApiVersioning(x =>
             {
@@ -56,6 +51,7 @@ namespace ShakespeareanPokemonDescriptor.Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

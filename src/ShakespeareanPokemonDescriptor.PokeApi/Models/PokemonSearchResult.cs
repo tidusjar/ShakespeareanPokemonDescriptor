@@ -6,7 +6,7 @@ namespace ShakespeareanPokemonDescriptor.PokeApi.Models
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
-        [JsonPropertyName("species")]
-        public PokemonSpeciesResult Species { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
     }
 }

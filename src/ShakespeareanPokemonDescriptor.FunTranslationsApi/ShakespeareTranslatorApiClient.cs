@@ -21,7 +21,8 @@ namespace ShakespeareanPokemonDescriptor.PokeApi
 
         public async Task<TranslationResult> Translate(string searchTerm, CancellationToken token)
         {
-            var result = await _httpClient.GetAsync($"shakespeare.json?text={searchTerm}", HttpCompletionOption.ResponseHeadersRead, token);
+            var formattedSearch = searchTerm.Replace("\n", " ");
+            var result = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"shakespeare.json?text={formattedSearch}"), HttpCompletionOption.ResponseHeadersRead, token);
 
             if (!result.IsSuccessStatusCode)
             {

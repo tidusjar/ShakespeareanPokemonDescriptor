@@ -35,18 +35,19 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
             {
                 Content = new TranslationContent
                 {
-                    Text = "Shakespearing Charmander Description"
+                    Translated = "Shakespearing Charmander Description"
                 }
             });
             var result = await Service.Describe("Charmander", "en-GB", CancellationToken.None);
-            Assert.That(result, Is.EqualTo("Shakespearing Charmander Description"));
+            Assert.That(result.Description, Is.EqualTo("Shakespearing Charmander Description"));
+            Assert.That(result.Name, Is.EqualTo("Charmander"));
         }
 
         [Test]
         public async Task InvalidPokemonName_Api_Returns_Null()
         {
             var result = await Service.Describe("some silly name", "en", CancellationToken.None);
-            Assert.That(result, Is.EqualTo(string.Empty));
+            Assert.That(result, Is.EqualTo(null));
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
             });
 
             var result = await Service.Describe("Charmander", "en", CancellationToken.None);
-            Assert.That(result, Is.EqualTo(string.Empty));
+            Assert.That(result, Is.EqualTo(null));
         }
 
         [TestCase(null, TestName = "NullRequestLanguage_Should_DefaultTo_En")]
@@ -72,12 +73,30 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
         }
 
         [Test]
+        public async Task RequestedLang_No_Translation_Should_FallBack_To_DefaultLang()
+        {
+            SetupBasicDataMocks("Mewto");
+
+            var result = await Service.Describe("Mewto", "es", CancellationToken.None);
+            TranslatorApiClientMock.Verify(x => x.Translate("English", It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task RequestedLang_Translation_Should_Use_That()
+        {
+            SetupBasicDataMocks("Mewto");
+
+            var result = await Service.Describe("Mewto", "jp", CancellationToken.None);
+            TranslatorApiClientMock.Verify(x => x.Translate("NotEnglish", It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
         public async Task Translate_API_Error()
         {
             SetupBasicDataMocks("Charmander");
 
             var result = await Service.Describe("Charmander", "en-GB", CancellationToken.None);
-            Assert.That(result, Is.EqualTo(string.Empty));
+            Assert.That(result, Is.EqualTo(null));
             TranslatorApiClientMock.Verify(x => x.Translate(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -87,7 +106,8 @@ namespace ShakespeareanPokemonDescriptor.Services.Tests
             CacheServiceMock.Setup(x => x.GetOrAddAsync(CacheKeys.PokemonSearchKey + pokemonName, It.IsAny<Func<Task<PokemonSearchResult>>>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PokemonSearchResult
                 {
-                    Id = 1
+                    Id = 1,
+                    Name = pokemonName
                 });
 
             CacheServiceMock.Setup(x => x.GetOrAddAsync(CacheKeys.PokemonSpeciesKey + 1, It.IsAny<Func<Task<PokemonSpeciesSearchResult>>>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
